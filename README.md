@@ -1,2 +1,2 @@
 # gostoso
-GoshBlessed Tools For System Operations
+Ghost Tools For System Operations
