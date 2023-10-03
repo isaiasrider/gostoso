@@ -35,7 +35,9 @@ func init() {
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gostoso.yaml)")
 
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "enable verbose mode - not functional yet")
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "enable debug mode - not functional yet")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
