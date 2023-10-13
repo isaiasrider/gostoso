@@ -1,36 +1,32 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"gostoso/functions/file_functions"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 // expandvarsCmd represents the expandvars command
 var expandvarsCmd = &cobra.Command{
 	Use:   "expandvars",
-	Short: "Expands variables in a file",
+	Short: "Expands (interpolate) environment variables in a file.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("expandvars called")
 		// parse flags
-		input, _ := cmd.Flags().GetString("inputfile")
-		output, _ := cmd.Flags().GetString("outputfile")
+		input, _ := cmd.Flags().GetString("input-file")
+		output, _ := cmd.Flags().GetString("output-file")
 
 		switch {
 		case input == "":
-			log.Fatal("you need to feed the flag --inputfile")
-
+			log.Fatal("You must set the flag --input-file")
 		case output == "":
-			log.Fatal("you need to feed the flag --outputfile")
+			log.Fatal("You must set the flag --output-file")
 		default:
-			fmt.Println("the commong behaviour is pop-up variables into the file")
+			fmt.Println("the common behaviour is interpolate variables into the file.")
 			file_functions.ExpandVars(input, output)
-
 		}
 	},
 }
@@ -38,8 +34,8 @@ var expandvarsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(expandvarsCmd)
 
-	expandvarsCmd.Flags().StringP("inputfile", "i", "", "Input template file with $VARIABLES")
-	expandvarsCmd.Flags().StringP("outputfile", "o", "", "Output file with any name you want")
+	expandvarsCmd.Flags().StringP("input-file", "i", "", "Input template file with env. $VARIABLE.")
+	expandvarsCmd.Flags().StringP("output-file", "o", "", "Output file name.")
 
 	// Here you will define your flags and configuration settings.
 

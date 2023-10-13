@@ -7,7 +7,7 @@ import (
 )
 
 func ExpandVars(inputfile string, outputfile string) {
-	fmt.Printf("Arquivo de entrada: %s \nArquivo de saída: %s", inputfile, outputfile)
+	fmt.Printf("Input file: '%s'\nOutput file: '%s'", inputfile, outputfile)
 
 	templateFile, err := os.ReadFile(inputfile)
 	if err != nil {
@@ -15,5 +15,4 @@ func ExpandVars(inputfile string, outputfile string) {
 	}
 
 	os.WriteFile(outputfile, []byte(os.ExpandEnv(string(templateFile))), 0777)
-
 }

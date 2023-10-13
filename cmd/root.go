@@ -1,9 +1,7 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -12,10 +10,9 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gostoso",
-	Short: "Ghost Open-Source Tool For System Operations",
-	Long:  ``,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+	Short: "Ghost Open-Source Tools for System Operations",
+	Long:  `GOSToSO: a CLI for deployment automation.`,
+	// Uncomment the following line if your bare application has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
@@ -24,6 +21,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
@@ -35,8 +33,8 @@ func init() {
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gostoso.yaml)")
 
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "enable verbose mode - not functional yet")
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "enable debug mode - not functional yet")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose mode (not implemented yet).")
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug mode (not implemented yet).")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
