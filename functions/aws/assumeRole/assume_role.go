@@ -6,47 +6,39 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"log"
 )
 
+type awsCredetials aws.Credentials
+
 func AssumeRole() {
-	// Initial credentials loaded from SDK's default credential chain. Such as
-	// the environment, shared credentials (~/.aws/credentials), or EC2 Instance
-	// Role. These credentials will be used to to make the STS Assume Role API.
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	// load a aws profile passed as flag
+
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile("default"))
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Printf("Loading Profile: \n\n")
+
 	// Create the credentials from AssumeRoleProvider to assume the role
-	// referenced by the "myRoleARN" ARN.
-	stsSvc := sts.NewFromConfig(cfg)
-	creds := stscreds.NewAssumeRoleProvider(stsSvc, "arn:aws:iam::622734844733:role/assumeRoleS3All")
+	// referenced by the "rolearn" flag.
+	stsClient := sts.NewFromConfig(cfg)
+	creds := stscreds.NewAssumeRoleProvider(stsClient, "arn:aws:iam::622734844733:role/assumeRoleS3All")
 
-	fmt.Println(creds.Retrieve(context.TODO()))
+	credentials, _ := creds.Retrieve(context.TODO())
 
-	cfg.Credentials = aws.NewCredentialsCache(creds)
+	fmt.Printf("Your AccessKeyId from AssumedRole: %s\n", credentials.AccessKeyID)
+	fmt.Printf("Your SecretAccessKey from AssumedRole: %s\n", credentials.SecretAccessKey)
+	fmt.Printf("Your SessionToken: %s\n", credentials.SessionToken)
+	fmt.Println()
 
-	// Create service client value configured for credentials
-	// from assumed role.
-	s3Client := s3.NewFromConfig(cfg)
-
-	count := 10
-	fmt.Printf("Let's list up to %v buckets for your account.\n", count)
-	result, err := s3Client.ListBuckets(context.TODO(), &s3.ListBucketsInput{})
+	// call sts get-caller-identity to confirm the user
+	identity, err := stsClient.GetCallerIdentity(context.TODO(), nil)
 	if err != nil {
-		fmt.Printf("Couldn't list buckets for your account. Here's why: %v\n", err)
-		return
+		log.Fatal(err)
 	}
-	if len(result.Buckets) == 0 {
-		fmt.Println("You don't have any buckets!")
-	} else {
-		if count > len(result.Buckets) {
-			count = len(result.Buckets)
-		}
-		for _, bucket := range result.Buckets[:count] {
-			fmt.Printf("\t%v\n", *bucket.Name)
-		}
-	}
+	fmt.Printf("Account: %s, Arn: %s\n", aws.ToString(identity.Account), aws.ToString(identity.Arn))
+
 }
