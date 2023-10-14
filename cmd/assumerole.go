@@ -5,37 +5,39 @@ package cmd
 
 import (
 	"fmt"
+	"gostoso/functions/aws/assumeRole"
+	"log"
 
 	"github.com/spf13/cobra"
-	"gostoso/functions/aws/assumeRole"
 )
 
 // assumeroleCmd represents the assumerole command
 var assumeroleCmd = &cobra.Command{
 	Use:   "assumerole",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "assumes a role with the profile passed as parameter",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("assumerole called - printing returned credentials")
-		assumeRole.AssumeRole()
+		fmt.Println("assumerole command called \n")
+		// parse flags
+		inputProfile, _ := cmd.Flags().GetString("profile")
+		inputRolearn, _ := cmd.Flags().GetString("role-arn")
+
+		switch {
+		case inputProfile == "":
+			log.Fatal("You must set the flag --profile")
+		case inputRolearn == "":
+			log.Fatal("You must set the flag --role-arn")
+		default:
+			fmt.Printf("flags checked...assuming role %s with profile %s\n", inputRolearn, inputProfile)
+			assumeRole.AssumeRole(inputProfile, inputRolearn)
+		}
+
 	},
 }
 
 func init() {
 	awsCmd.AddCommand(assumeroleCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// assumeroleCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// assumeroleCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	assumeroleCmd.Flags().StringP("profile", "p", "", "Profile whose has the hability to assume this role")
+	assumeroleCmd.Flags().StringP("role-arn", "r", "", "Role that will be assumed by profile")
 }
