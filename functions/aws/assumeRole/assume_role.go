@@ -12,26 +12,26 @@ import (
 
 type awsCredetials aws.Credentials
 
-func AssumeRole() {
+func AssumeRole(profile string, rolearn string) {
 	// load a aws profile passed as flag
 
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile("default"))
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile(profile))
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Printf("Loading Profile: \n\n")
+	fmt.Printf("Loading Profile: %s\n\n", profile)
 
 	// Create the credentials from AssumeRoleProvider to assume the role
 	// referenced by the "rolearn" flag.
 	stsClient := sts.NewFromConfig(cfg)
-	creds := stscreds.NewAssumeRoleProvider(stsClient, "arn:aws:iam::622734844733:role/assumeRoleS3All")
+	creds := stscreds.NewAssumeRoleProvider(stsClient, rolearn)
 
 	credentials, _ := creds.Retrieve(context.TODO())
 
-	fmt.Printf("Your AccessKeyId from AssumedRole: %s\n", credentials.AccessKeyID)
-	fmt.Printf("Your SecretAccessKey from AssumedRole: %s\n", credentials.SecretAccessKey)
-	fmt.Printf("Your SessionToken: %s\n", credentials.SessionToken)
+	fmt.Printf("Your AccessKeyId from AssumedRole: %s\n\n", credentials.AccessKeyID)
+	fmt.Printf("Your SecretAccessKey from AssumedRole: %s\n\n", credentials.SecretAccessKey)
+	fmt.Printf("Your SessionToken: %s\n\n", credentials.SessionToken)
+	fmt.Printf("Your Credentials Expires: %s\n", credentials.Expires)
 	fmt.Println()
 
 	// call sts get-caller-identity to confirm the user
