@@ -61,8 +61,10 @@ func TestGostosoCliFileFunctions(t *testing.T) {
 })
 	t.Run("ExpandVarsWriteFile", func(t *testing.T) {
 
-		os.Setenv(teste, "teste")
-		fmt.Println(os.Getenv(teste))
+		os.Setenv("TESTE", "TESTE")
+		variable := os.Getenv("TESTE")
+		fmt.Printf("environment variable 'TESTE' : %s\n", variable)
+	
 		cmd := exec.Command(cmdPath, "expandvars", "--input-file", inputfile, "--output-file", resultFile)
 		if err := cmd.Run(); err != nil {
 			t.Fatal(err)
