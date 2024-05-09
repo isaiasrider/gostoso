@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"bytes"
+	"io/ioutil"
 )
 
 var (
@@ -37,9 +39,6 @@ func TestMain(m *testing.M) {
 
 	fmt.Println("Running tests...")
 	result := m.Run()
-
-	fmt.Println("Cleaning up...removing binaries")
-
 	os.Exit(result)
 }
 
@@ -59,16 +58,42 @@ func TestGostosoCliFileFunctions(t *testing.T) {
 			t.Fatal(err)
 			}
 })
+
 	t.Run("ExpandVarsWriteFile", func(t *testing.T) {
 
 		os.Setenv("TESTE", "TESTE")
 		variable := os.Getenv("TESTE")
-		fmt.Printf("environment variable 'TESTE' : %s\n", variable)
-	
+		t.Logf("environment variable 'TESTE' : %s\n", variable)
+
 		cmd := exec.Command(cmdPath, "expandvars", "--input-file", inputfile, "--output-file", resultFile)
 		if err := cmd.Run(); err != nil {
 			t.Fatal(err)
 			}
 		
+		expected, err := ioutil.ReadFile(goldenFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		result, err := ioutil.ReadFile(resultFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !bytes.Equal(expected, result) {
+		t.Logf("goldenFile:\n%s", expected)
+		t.Logf("resultFile:\n%s", result)
+		t.Error("Result content doest not match golden file")
+		}
+		
+})
+
+t.Run("RemoveBinary", func(t *testing.T) {
+	fmt.Println("Removing Binary")
+	err := os.Remove(binName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	
 })
 }
