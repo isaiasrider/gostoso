@@ -6,10 +6,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 var (
 	binName = "gostoso"
+	teste string
+)
+
+const (
+	inputfile = "./testdata/expandvars/templatefile.txt"
+	resultFile = "./testdata/expandvars/result.txt"
+	goldenFile = "./testdata/expandvars/expected.txt"
 )
 
 func TestMain(m *testing.M) {
@@ -31,8 +39,34 @@ func TestMain(m *testing.M) {
 	result := m.Run()
 
 	fmt.Println("Cleaning up...removing binaries")
-	os.Remove(binName)
 
 	os.Exit(result)
 }
 
+func TestGostosoCliFileFunctions(t *testing.T) {
+
+	dir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cmdPath := filepath.Join(dir, binName)
+
+	t.Run("ExpandVarsHelpMenu", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "expandvars", "--help")
+
+		if err := cmd.Run(); err != nil {
+			t.Fatal(err)
+			}
+})
+	t.Run("ExpandVarsWriteFile", func(t *testing.T) {
+
+		os.Setenv(teste, "teste")
+		fmt.Println(os.Getenv(teste))
+		cmd := exec.Command(cmdPath, "expandvars", "--input-file", inputfile, "--output-file", resultFile)
+		if err := cmd.Run(); err != nil {
+			t.Fatal(err)
+			}
+		
+})
+}
